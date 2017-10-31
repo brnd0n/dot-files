@@ -1,12 +1,81 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
-
-# If not running interactively, don't do anything
+#!/bin/bash
+##############################################################################
+#                                                                            #
+#     .bashrc                                                                #
+#                                                                            #
+#     This file is executed at login/rlogin time or when bash is invoked.    #
+#                                                                            #
+##############################################################################
+##############################################################################
+#                        Return if not interactive                           #
+##############################################################################
 case $- in
-    *i*) ;;
-      *) return;;
+ *i*) ;;
+   *) return;;
 esac
+
+host=`uname -n | cut -d. -f1`
+
+##############################################################################
+#                         Common aliases and export's                        #
+##############################################################################
+alias v="vim"
+alias cs="cscope -q $*"
+alias ls="ls -F"
+alias l="ls -l"
+alias la="ls -a"
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .4='cd ../../../..'
+alias .5='cd ../../../../..'
+alias bldcs="find . -name *.[cdhm] > cscope.files;cs"
+alias bldjcs="find . -name *.java > cscope.files;cs"
+export CLICOLOR=yes
+
+
+# Enable Bash autocompletion
+if [[ -e /etc/bash_completion ]]; then
+  . /etc/bash_completion
+fi
+
+# Set Dark Solarized colors for ls
+eval `dircolors -b ~/.dircolors`
+
+
+##############################################################################
+#                               User Defined Functions                       #
+##############################################################################
+
+function lsl {
+ls -l $* | awk \
+  '{ printf("%-11s%7s  %-4s%2s %-7s%s %s %s\n",$1,$5,$6,$7,$8,$9,$10,$11); }'
+}
+
+function mcd                      # Make a directory and change to it
+{
+  if (( $# != 1 )) ; then
+    print -u2 "usage:  ${0##*/} directory to make and change to"
+    return 2
+  fi
+  mkdir "$1" ; cd "$1"
+}
+
+function cl                       # cd and ls
+{
+  cd $1
+  ls
+}
+
+function csloc
+{
+  find . -name "*.[chdm]" -print0 | xargs -0 wc -l
+}
+
+
+#########################################################################
+# Ubuntu .bashrc below
+#########################################################################
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -25,7 +94,7 @@ shopt -s checkwinsize
 
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
-#shopt -s globstar
+shopt -s globstar
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
